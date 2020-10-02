@@ -1,0 +1,2 @@
+speedtest-cli>=2.1.2
+prometheus_client>=0.8.0 
