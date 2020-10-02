@@ -3,9 +3,9 @@ import time
 import speedtest
 from prometheus_client import start_http_server, Gauge
 
-def btomb(speed):
-    speed = speed * pow(10,-6)
-    return speed
+def to_mb(bytes_per_sec):
+    mbs=round(bytes_per_sec / (10**6), 2)
+    return str(mbs) + " MB/s"
 
 def run_speedtest():
     servers = []
@@ -21,6 +21,8 @@ def update_results(test_done):
     ping.set(test_done[0])
     download_speed.set(test_done[1])
     upload_speed.set(test_done[2])
+    current_dt = datetime.datetime.now()
+    print(current_dt.strftime("%H:%M:%S -") + "Ping:" + str(test_done[0]) + " Download:" + to_mb(test_done[1]) + " Upload:" + to_mb(test_done[2]))
 
 def run(http_port, sleep_time):
     start_http_server(http_port)
