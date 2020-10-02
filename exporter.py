@@ -1,7 +1,7 @@
 import datetime
 import time
 import speedtest
-from prometheus_client import start_http_server, Summary, Gauge
+from prometheus_client import start_http_server, Gauge
 
 def btomb(speed):
     speed = speed * pow(10,-6)
@@ -19,9 +19,9 @@ def test():
     current_ping=s.results.ping
     down_speed=s.download()
     up_speed=s.upload()
-    currentDT = datetime.datetime.now()
-    print("Current Download Speed:" + str(btomb(down_speed)) + " at: " + currentDT.strftime("%H:%M:%S"))
-    print("Current Upload Speed:" + str(btomb(up_speed)) + " at: " + currentDT.strftime("%H:%M:%S"))
+    current_dt = datetime.datetime.now()
+    print("Current Download Speed:" + str(btomb(down_speed)) + " at: " + current_dt.strftime("%H:%M:%S"))
+    print("Current Upload Speed:" + str(btomb(up_speed)) + " at: " + current_dt.strftime("%H:%M:%S"))
     ping.set(current_ping)
     download_speed.set(down_speed)
     upload_speed.set(up_speed)
