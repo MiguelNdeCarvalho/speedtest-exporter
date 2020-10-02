@@ -29,5 +29,9 @@ services:
     restart: unless-stopped
 ```
 
-
 Then just acess the page `http://localhost:9112/` and you will have the metrics.
+
+## TO Do List
+
+- [ ] Add option to choose **Server ID**
+- [ ] Add option to choose the interval
