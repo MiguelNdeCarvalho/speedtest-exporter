@@ -1,4 +1,4 @@
-#speedtest-exporter
+# Speedtest Exporter
 
 ## Description
 
