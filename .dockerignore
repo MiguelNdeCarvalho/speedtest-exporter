@@ -1,3 +1,4 @@
 .git
 License
 *.md
+Dockerfile
