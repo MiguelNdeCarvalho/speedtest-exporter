@@ -1,6 +1,6 @@
-import speedtest
 import datetime
 import time
+import speedtest
 from prometheus_client import start_http_server, Summary, Gauge
 
 def btomb(speed):
