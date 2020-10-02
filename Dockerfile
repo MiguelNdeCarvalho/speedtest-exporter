@@ -1,5 +1,5 @@
 ARG ARCH
-FROM ${ARCH}/python:alpine3.12
+FROM ${ARCH}python:alpine3.12
 
 WORKDIR /app
 
