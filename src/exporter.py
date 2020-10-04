@@ -1,28 +1,39 @@
+import subprocess
+import json
 import datetime
 import time
-import speedtest
 from prometheus_client import start_http_server, Gauge
 
-def to_mb(bytes_per_sec):
-    mbs=round(bytes_per_sec / (10**6), 2)
-    return str(mbs) + " MB/s"
+def bytes_to_bits(bytes_per_sec):
+    return bytes_per_sec * 8
+
+def bits_to_megabits(bits_per_sec):
+    megabits = round(bits_per_sec * (10**-6),2)
+    return str(megabits) + " Mb/s"
+
+def is_json(myjson):
+    try:
+        json_object = json.loads(myjson)
+    except ValueError as e:
+        return False
+    return True
 
 def run_speedtest():
-    servers = []
-    s = speedtest.Speedtest()
-    s.get_servers(servers)
-    s.get_best_server()
-    actual_ping=s.results.ping
-    download=s.download()
-    upload=s.upload()
-    return (actual_ping, download, upload)
+    cmd = ["speedtest", "--format=json-pretty", "--progress=no", "--accept-license", "--accept-gdpr"]
+    output = subprocess.check_output(cmd)
+    if is_json(output):
+        data = json.loads(output)
+        actual_ping = int(data['ping']['latency'])
+        download = bytes_to_bits(data['download']['bandwidth'])
+        upload = bytes_to_bits(data['upload']['bandwidth'])
+        return (actual_ping, download, upload)
 
 def update_results(test_done):
     ping.set(test_done[0])
     download_speed.set(test_done[1])
     upload_speed.set(test_done[2])
     current_dt = datetime.datetime.now()
-    print(current_dt.strftime("%H:%M:%S -") + "Ping:" + str(test_done[0]) + " Download:" + to_mb(test_done[1]) + " Upload:" + to_mb(test_done[2]))
+    print(current_dt.strftime("%H:%M:%S -") + "Ping:" + str(test_done[0]) + " Download:" + bits_to_megabits(test_done[1]) + " Upload:" + bits_to_megabits(test_done[2]))
 
 def run(http_port, sleep_time):
     start_http_server(http_port)
