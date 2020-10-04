@@ -5,7 +5,8 @@ import time
 from prometheus_client import start_http_server, Gauge
 
 def to_mb(bytes_per_sec):
-    mbs=round(bytes_per_sec / (10**6), 2)
+    bits = bytes_per_sec * 8
+    mbs=round(bits / (10**6), 2)
     return str(mbs) + " MB/s"
 
 def is_json(myjson):
@@ -21,8 +22,8 @@ def run_speedtest():
     if is_json(output):
         data = json.loads(output)
         actual_ping = int(float(data['ping']['latency']))
-        download = to_mb(data['download']['bandwidth'])
-        upload = to_mb(data['upload']['bandwidth'])
+        download = int(data['download']['bandwidth'])
+        upload = int(data['upload']['bandwidth'])
         return (actual_ping, download, upload)
 
 def update_results(test_done):
