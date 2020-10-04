@@ -5,6 +5,7 @@ WORKDIR /app
 
 COPY . .
 
+RUN adduser -D speedtest
 RUN pip install -r requirements.txt && \
     export ARCHITECTURE=$(uname -m) && \
     if [ "$ARCHITECTURE" == 'armv7l' ]; then export ARCHITECTURE=arm; fi && \
@@ -12,6 +13,9 @@ RUN pip install -r requirements.txt && \
     tar zxvf /tmp/speedtest.tgz -C /tmp && \
     cp /tmp/speedtest /usr/local/bin && \
     rm -rf /tmp/*
+
+RUN chown -R speedtest:speedtest /app
+USER speedtest
 
 EXPOSE 9112
 
