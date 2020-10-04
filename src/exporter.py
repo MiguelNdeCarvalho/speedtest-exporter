@@ -4,10 +4,8 @@ import datetime
 import time
 from prometheus_client import start_http_server, Gauge
 
-def to_mb(bytes_per_sec):
-    bits = bytes_per_sec * 8
-    mbs=round(bits / (10**6), 2)
-    return str(mbs) + " MB/s"
+def bytes_to_bits(bytes_per_sec):
+    return bytes_per_sec * 8
 
 def is_json(myjson):
     try:
