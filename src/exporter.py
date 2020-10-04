@@ -8,7 +8,7 @@ def bytes_to_bits(bytes_per_sec):
     return bytes_per_sec * 8
 
 def bits_to_megabits(bits_per_sec):
-    megabits = bits_per_sec * (10**-6)
+    megabits = round(bits_per_sec * (10**-6),2)
     return str(megabits) + " Mb/s"
 
 def is_json(myjson):
