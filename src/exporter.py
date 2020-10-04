@@ -23,8 +23,8 @@ def run_speedtest():
     if is_json(output):
         data = json.loads(output)
         actual_ping = int(data['ping']['latency'])
-        download = int(data['download']['bandwidth'])
-        upload = int(data['upload']['bandwidth'])
+        download = bytes_to_bits(data['download']['bandwidth'])
+        upload = bytes_to_bits(data['upload']['bandwidth'])
         return (actual_ping, download, upload)
 
 def update_results(test_done):
