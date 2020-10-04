@@ -32,7 +32,7 @@ def update_results(test_done):
     download_speed.set(test_done[1])
     upload_speed.set(test_done[2])
     current_dt = datetime.datetime.now()
-    print(current_dt.strftime("%H:%M:%S -") + "Ping:" + str(test_done[0]) + " Download:" + to_mb(test_done[1]) + " Upload:" + to_mb(test_done[2]))
+    print(current_dt.strftime("%H:%M:%S -") + "Ping:" + str(test_done[0]) + " Download:" + bits_to_megabits(test_done[1]) + " Upload:" + bits_to_megabits(test_done[2]))
 
 def run(http_port, sleep_time):
     start_http_server(http_port)
