@@ -22,7 +22,7 @@ def run_speedtest():
     output = subprocess.check_output(cmd)
     if is_json(output):
         data = json.loads(output)
-        actual_ping = int(float(data['ping']['latency']))
+        actual_ping = int(data['ping']['latency'])
         download = int(data['download']['bandwidth'])
         upload = int(data['upload']['bandwidth'])
         return (actual_ping, download, upload)
