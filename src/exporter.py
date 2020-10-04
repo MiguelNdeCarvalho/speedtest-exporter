@@ -7,6 +7,9 @@ from prometheus_client import start_http_server, Gauge
 def bytes_to_bits(bytes_per_sec):
     return bytes_per_sec * 8
 
+def bits_to_megabits(bits_per_sec):
+    return bits_per_sec * (10**-6)
+
 def is_json(myjson):
     try:
         json_object = json.loads(myjson)
