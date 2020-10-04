@@ -9,7 +9,7 @@ def bytes_to_bits(bytes_per_sec):
 
 def bits_to_megabits(bits_per_sec):
     megabits = round(bits_per_sec * (10**-6),2)
-    return str(megabits) + "Mb/s"
+    return str(megabits) + " Mb/s"
 
 def is_json(myjson):
     try:
@@ -33,7 +33,7 @@ def update_results(test_done):
     download_speed.set(test_done[1])
     upload_speed.set(test_done[2])
     current_dt = datetime.datetime.now()
-    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Ping:" + str(test_done[0]) + " Download:" + bits_to_megabits(test_done[1]) + " Upload:" + bits_to_megabits(test_done[2]))
+    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Ping: " + str(test_done[0]) + " ms | Download: " + bits_to_megabits(test_done[1]) + " | Upload:" + bits_to_megabits(test_done[2]))
 
 def run(http_port, sleep_time):
     start_http_server(http_port)
