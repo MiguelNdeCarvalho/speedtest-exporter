@@ -1,6 +1,5 @@
 import datetime
 import time
-import speedtest
 from prometheus_client import start_http_server, Gauge
 
 def to_mb(bytes_per_sec):
