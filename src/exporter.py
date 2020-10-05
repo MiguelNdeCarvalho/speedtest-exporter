@@ -45,9 +45,9 @@ def run(http_port, sleep_time):
 
 if __name__ == '__main__':
     # Create the Metrics
-    ping = Gauge('speedtest_ping', 'Speedtest current Ping')
-    download_speed = Gauge('speedtest_download_speed', 'Speedtest current Download Speed')
-    upload_speed = Gauge('speedtest_upload_speed', 'Upload speed')
+    ping = Gauge('speedtest_ping_latency_milliseconds', 'Speedtest current Ping in ms')
+    download_speed = Gauge('speedtest_download_bits_per_second', 'Speedtest current Download Speed in bit/s')
+    upload_speed = Gauge('speedtest_upload_bits_per_second', 'Speedtest current Upload speed in bits/s')
     PORT=9112
     SLEEP=95
     run(PORT, SLEEP)
