@@ -20,15 +20,19 @@ def is_json(myjson):
     return True
 
 def run_speedtest():
+    print('Starting speedtest')
     cmd = ["speedtest", "--format=json-pretty", "--progress=no", "--accept-license", "--accept-gdpr"]
     server = os.environ.get('SPEEDTEST_SERVER')
     if server:
         if server.isnumeric():
             print("Using custom server ID: "+str(server))
-            cmd.append("--server-id="+str(server))
-    output = subprocess.check_output(cmd)
+            cmd.append("--server-id=" + str(server))
 
     while True:
+        try:
+            output = subprocess.check_output(cmd)
+        except subprocess.CalledProcessError as e:
+            output = e.output
         if is_json(output):
             data = json.loads(output)
             if "error" in data:
