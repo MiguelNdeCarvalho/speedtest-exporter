@@ -27,12 +27,23 @@ def run_speedtest():
             print("Using custom server ID: "+str(server))
             cmd.append("--server-id="+str(server))
     output = subprocess.check_output(cmd)
-    if is_json(output):
-        data = json.loads(output)
-        actual_ping = int(data['ping']['latency'])
-        download = bytes_to_bits(data['download']['bandwidth'])
-        upload = bytes_to_bits(data['upload']['bandwidth'])
-        return (actual_ping, download, upload)
+
+    while True:
+        if is_json(output):
+            data = json.loads(output)
+            if "error" in data:
+                # If we get here it probably means that socket timed out(Network issues?)
+                print('Something went wrong')
+                print(data['error'])
+                return None
+            if "type" in data:
+                if data['type'] == 'log':
+                    print(str(data["timestamp"]) + " - " + str(data["message"]))
+                if data['type'] == 'result':
+                    actual_ping = int(data['ping']['latency'])
+                    download = bytes_to_bits(data['download']['bandwidth'])
+                    upload = bytes_to_bits(data['upload']['bandwidth'])
+                    return (actual_ping, download, upload)
 
 def update_results(test_done):
     ping.set(test_done[0])
@@ -46,8 +57,9 @@ def run(http_port, sleep_time):
     print("Successfully started Speedtest Exporter on http://localhost:" + str(http_port))
     while True:
         test = run_speedtest()
-        update_results(test)
-        time.sleep(sleep_time)
+        if isinstance(test, tuple):
+            update_results(test)
+            time.sleep(sleep_time)
 
 if __name__ == '__main__':
     # Create the Metrics
