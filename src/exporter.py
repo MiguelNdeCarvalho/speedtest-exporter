@@ -2,6 +2,7 @@ import subprocess
 import json
 import datetime
 import time
+import os
 from prometheus_client import start_http_server, Gauge
 
 def bytes_to_bits(bytes_per_sec):
@@ -20,6 +21,11 @@ def is_json(myjson):
 
 def run_speedtest():
     cmd = ["speedtest", "--format=json-pretty", "--progress=no", "--accept-license", "--accept-gdpr"]
+    server = os.environ.get('SPEEDTEST_SERVER')
+    if server:
+        if server.isnumeric():
+            print("Using custom server ID: "+str(server))
+            cmd.append("--server-id="+str(server))
     output = subprocess.check_output(cmd)
     if is_json(output):
         data = json.loads(output)
