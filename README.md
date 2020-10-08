@@ -9,7 +9,7 @@ Simple **Speedtest exporter** for **Prometheus** written in **Python** using the
 ```bash
 docker run -d \
   --name=speedtest-exporter \
-  -p 9112:9112 \
+  -p 9800:9800 \
   --restart unless-stopped \
   miguelndecarvalho/speedtest-exporter
 ```
@@ -23,11 +23,11 @@ services:
     image: miguelndecarvalho/speedtest-exporter
     container_name: speedtest-exporter
     ports:
-      - 9112:9112
+      - 9800:9800
     restart: unless-stopped
 ```
 
-Then just acess the page `http://localhost:9112/` and you will have the metrics.
+Then just acess the page `http://localhost:9800/` and you will have the metrics.
 
 ### Environment Variables
 
