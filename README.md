@@ -1,12 +1,10 @@
 # Speedtest Exporter
 
-## Description
+Simple **Speedtest exporter** for **Prometheus** written in **Python** using the official CLI from **Ookla**
 
-This is a simple **speedtest exporter** for **Prometheus** written in **Python**
+## Quick Start
 
-## Running the Container
-
-To run the container via **CLI**:
+**Docker**:
 
 ```bash
 docker run -d \
@@ -30,3 +28,10 @@ services:
 ```
 
 Then just acess the page `http://localhost:9112/` and you will have the metrics.
+
+### Environment Variables
+
+The following environment variables configure the exporter:
+
+* `SPEEDTEST_SERVER`
+  Custom server ID from Speedtest server list like [https://telcodb.net/explore/speedtest-servers/](https://telcodb.net/explore/speedtest-servers/)
