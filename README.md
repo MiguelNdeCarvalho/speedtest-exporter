@@ -35,3 +35,6 @@ The following environment variables configure the exporter:
 
 * `SPEEDTEST_SERVER`
   Custom server ID from Speedtest server list like [https://telcodb.net/explore/speedtest-servers/](https://telcodb.net/explore/speedtest-servers/)
+
+* `SPEEDTEST_PORT`
+  Port where metrics will be exposed. **Default:**`9800`
