@@ -45,18 +45,20 @@ def run_speedtest():
                     print(str(data["timestamp"]) + " - " + str(data["message"]))
                 if data['type'] == 'result':
                     actual_server = int(data['server']['id'])
+                    actual_jitter = data['ping']['jitter']
                     actual_ping = int(data['ping']['latency'])
                     download = bytes_to_bits(data['download']['bandwidth'])
                     upload = bytes_to_bits(data['upload']['bandwidth'])
-                    return (actual_server, actual_ping, download, upload)
+                    return (actual_server, actual_jitter, actual_ping, download, upload)
 
 def update_results(test_done):
     server.set(test_done[0]) 
-    ping.set(test_done[1])
-    download_speed.set(test_done[2])
-    upload_speed.set(test_done[3])
+    jitter.set(test_done[1])
+    ping.set(test_done[2])
+    download_speed.set(test_done[3])
+    upload_speed.set(test_done[4])
     current_dt = datetime.datetime.now()
-    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: " + str(test_done[0]) + "| Ping: " + str(test_done[1]) + " ms | Download: " + bits_to_megabits(test_done[2]) + " | Upload:" + bits_to_megabits(test_done[3]))
+    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: " + str(test_done[0]) + " | Jitter: " + str(test_done[1]) + " ms | Ping: " + str(test_done[2]) + " ms | Download: " + bits_to_megabits(test_done[3]) + " | Upload:" + bits_to_megabits(test_done[4]))
 
 def run(http_port, sleep_time):
     start_http_server(http_port)
@@ -70,6 +72,7 @@ def run(http_port, sleep_time):
 if __name__ == '__main__':
     # Create the Metrics
     server = Gauge('speedtest_server_id', 'Speedtest server ID used to test')
+    jitter = Gauge('speedtest_jitter_latency_milliseconds', 'Speedtest current Jitter in ms')
     ping = Gauge('speedtest_ping_latency_milliseconds', 'Speedtest current Ping in ms')
     download_speed = Gauge('speedtest_download_bits_per_second', 'Speedtest current Download Speed in bit/s')
     upload_speed = Gauge('speedtest_upload_bits_per_second', 'Speedtest current Upload speed in bits/s')
