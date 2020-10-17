@@ -25,6 +25,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
+        name: Get Current Tag
+        id: tag
+        uses: "WyriHaximus/github-action-get-previous-tag@master"
+      -
         name: Build and push
         uses: docker/build-push-action@v2
         with:
