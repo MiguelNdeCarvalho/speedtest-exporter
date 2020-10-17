@@ -76,10 +76,6 @@ if __name__ == '__main__':
     ping = Gauge('speedtest_ping_latency_milliseconds', 'Speedtest current Ping in ms')
     download_speed = Gauge('speedtest_download_bits_per_second', 'Speedtest current Download Speed in bit/s')
     upload_speed = Gauge('speedtest_upload_bits_per_second', 'Speedtest current Upload speed in bits/s')
-    server_port = os.environ.get('SPEEDTEST_PORT')
-    if server_port:
-        PORT=int(server_port)
-    else:
-        PORT=9800
-    SLEEP=95
-    run(PORT, SLEEP)
+    PORT = os.getenv('SPEEDTEST_PORT', 9800)
+    SLEEP = os.getenv('SPEEDTEST_INTERVAL', 300)
+    run(int(PORT), int(SLEEP))
