@@ -46,7 +46,7 @@ def run_speedtest():
                 if data['type'] == 'result':
                     actual_server = int(data['server']['id'])
                     actual_jitter = data['ping']['jitter']
-                    actual_ping = int(data['ping']['latency'])
+                    actual_ping = data['ping']['latency']
                     download = bytes_to_bits(data['download']['bandwidth'])
                     upload = bytes_to_bits(data['upload']['bandwidth'])
                     return (actual_server, actual_jitter, actual_ping, download, upload)
