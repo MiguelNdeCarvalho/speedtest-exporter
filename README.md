@@ -38,3 +38,6 @@ The following environment variables configure the exporter:
 
 * `SPEEDTEST_PORT`
   Port where metrics will be exposed. **Default:**`9800`
+
+* `SPEEDTEST_INTERVAL`
+  Choose the time between the executions of the tests **Default:**`300`**in seconds**

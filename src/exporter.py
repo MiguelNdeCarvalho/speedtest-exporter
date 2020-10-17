@@ -81,5 +81,5 @@ if __name__ == '__main__':
         PORT=int(server_port)
     else:
         PORT=9800
-    SLEEP=95
+    SLEEP = os.getenv('SPEEDTEST_INTERVAL', 300)
     run(PORT, SLEEP)
