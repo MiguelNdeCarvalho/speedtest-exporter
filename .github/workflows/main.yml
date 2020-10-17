@@ -1,8 +1,9 @@
 name: ci
 
-on:
+on:  
   push:
-    branches: main
+    tags:
+      - '*'
 
 jobs:
   path-context:
@@ -24,6 +25,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
+        name: Get Current Tag
+        id: tag
+        uses: "WyriHaximus/github-action-get-previous-tag@master"
+      -
         name: Build and push
         uses: docker/build-push-action@v2
         with:
@@ -31,4 +36,6 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: true
-          tags: miguelndecarvalho/speedtest-exporter
+          tags: | 
+            miguelndecarvalho/speedtest-exporter:latest
+            miguelndecarvalho/speedtest-exporter:${{ steps.tag.outputs.tag }}
