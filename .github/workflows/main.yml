@@ -1,8 +1,9 @@
 name: ci
 
-on:
+on:  
   push:
-    branches: main
+    tags:
+      - '*'
 
 jobs:
   path-context:
