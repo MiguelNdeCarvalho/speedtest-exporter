@@ -3,7 +3,7 @@ FROM ${ARCH}python:alpine3.12
 
 WORKDIR /app
 
-COPY . .
+COPY src/. .
 
 RUN adduser -D speedtest
 RUN pip install -r requirements.txt && \
@@ -12,11 +12,12 @@ RUN pip install -r requirements.txt && \
     wget -O /tmp/speedtest.tgz "https://bintray.com/ookla/download/download_file?file_path=ookla-speedtest-1.0.0-${ARCHITECTURE}-linux.tgz" && \
     tar zxvf /tmp/speedtest.tgz -C /tmp && \
     cp /tmp/speedtest /usr/local/bin && \
-    rm -rf /tmp/*
+    rm -rf /tmp/* && \
+    rm requirements.txt
 
 RUN chown -R speedtest:speedtest /app
 USER speedtest
 
 EXPOSE 9112
 
-CMD [ "python", "-u", "src/exporter.py" ]
+CMD [ "python", "-u", "exporter.py" ]
