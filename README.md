@@ -1,6 +1,7 @@
 # Speedtest Exporter
 
-Simple **Speedtest exporter** for **Prometheus** written in **Python** using the official CLI from **Ookla**
+Simple **Speedtest exporter** for **Prometheus** written in **Python** using the
+official CLI from **Ookla**
 
 ## Setting up the Exporter
 
@@ -47,18 +48,28 @@ services:
 
 Then just acess the page `http://localhost:9800/` and you will have the metrics.
 
-### Settings for the Exporter
+### Arguments for the Exporter
 
-The following environment variables configure the exporter:
+The following arguments can change the settings of the **exporter**:
 
-* `SPEEDTEST_SERVER`
-  Custom server ID from Speedtest server list like [https://telcodb.net/explore/speedtest-servers/][2]
+#### ServerID
 
-* `SPEEDTEST_PORT`
-  Port where metrics will be exposed. **Default:**`9800`
+You can set a server and the **exporter** will use that server to do the tests.
+[List of Servers][2]
 
-* `SPEEDTEST_INTERVAL`
-  Choose the time between the executions of the tests **Default:**`300`**in seconds**
+Usage: `--server-id ID`
+
+#### Port
+
+You can set a port where metrics will be exposed. **Default** is `9800`.
+
+Usage: `--port PORT`
+  
+#### Interval
+  
+You can set the time between the executions of the tests. **Default:**`300`**(s)**
+
+Usage: `--interval INTERVAL`
 
 ## Add to Prometheus
 
@@ -76,5 +87,5 @@ To add the **Speedtest Exporter** to your **Prometheus** just add this to your `
 The **Grafana Dashboard** can be found [here][3]
 
 [1]: https://www.speedtest.net/pt/apps/cli
-[2]: https://telcodb.net/explore/speedtest-servers/
+[2]: https://williamyaps.github.io/wlmjavascript/servercli.html
 [3]: https://grafana.com/grafana/dashboards/13665
