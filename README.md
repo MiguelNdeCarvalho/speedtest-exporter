@@ -41,3 +41,7 @@ The following environment variables configure the exporter:
 
 * `SPEEDTEST_INTERVAL`
   Choose the time between the executions of the tests **Default:**`300`**in seconds**
+
+## Grafana Dashboard
+
+The **Grafana Dashboard** can be found [here](https://grafana.com/grafana/dashboards/13665)
