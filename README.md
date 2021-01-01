@@ -33,7 +33,7 @@ services:
 * Git installed;
 * Python3 installed;
 * Pip installed;
-* [Speedtest CLI by Ookla](https://www.speedtest.net/pt/apps/cli)
+* [Speedtest CLI by Ookla][1]
 2. **Clone repo**
 
 `git clone https://github.com/MiguelNdeCarvalho/speedtest-exporter.git`
@@ -52,7 +52,7 @@ Then just acess the page `http://localhost:9800/` and you will have the metrics.
 The following environment variables configure the exporter:
 
 * `SPEEDTEST_SERVER`
-  Custom server ID from Speedtest server list like [https://telcodb.net/explore/speedtest-servers/](https://telcodb.net/explore/speedtest-servers/)
+  Custom server ID from Speedtest server list like [https://telcodb.net/explore/speedtest-servers/][2]
 
 * `SPEEDTEST_PORT`
   Port where metrics will be exposed. **Default:**`9800`
@@ -73,4 +73,8 @@ To add the **Speedtest Exporter** to your **Prometheus** just add this to your `
 
 ## Grafana Dashboard
 
-The **Grafana Dashboard** can be found [here](https://grafana.com/grafana/dashboards/13665)
+The **Grafana Dashboard** can be found [here][3]
+
+[1]: https://www.speedtest.net/pt/apps/cli
+[2]: https://telcodb.net/explore/speedtest-servers/
+[3]: https://grafana.com/grafana/dashboards/13665
