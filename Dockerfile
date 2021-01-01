@@ -18,6 +18,6 @@ RUN pip install -r requirements.txt && \
 RUN chown -R speedtest:speedtest /app
 USER speedtest
 
-EXPOSE 9112
+EXPOSE 9800
 
 CMD [ "python", "-u", "exporter.py" ]
