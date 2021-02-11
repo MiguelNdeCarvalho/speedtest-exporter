@@ -3,7 +3,6 @@ import json
 import datetime
 import time
 import os
-import argparse
 from prometheus_client import start_http_server, Gauge
 
 def bytes_to_bits(bytes_per_sec):
@@ -23,7 +22,7 @@ def is_json(myjson):
 def run_speedtest():
     print('Starting speedtest')
     cmd = ["speedtest", "--format=json-pretty", "--progress=no", "--accept-license", "--accept-gdpr"]
-    server = args.serverID
+    server = os.environ.get('SPEEDTEST_SERVER')
     if server:
         if server.isnumeric():
             print("Using custom server ID: "+str(server))
@@ -71,17 +70,12 @@ def run(http_port, sleep_time):
             time.sleep(sleep_time)
 
 if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-s', '-server-id','--server-id', action='store', dest='serverID', help='Specify a server from the server list using its id')
-    parser.add_argument('-p', '-port', '--port', action='store', dest='port', help='Specify a port where the metrics will be exposed', default='9800')
-    parser.add_argument('-i', '-interval', '--interval', action='store', dest='interval', help='Specify the time between the executions of the tests', default='300')
-    args = parser.parse_args()
-
-    #Create the Metrics
+    # Create the Metrics
     server = Gauge('speedtest_server_id', 'Speedtest server ID used to test')
     jitter = Gauge('speedtest_jitter_latency_milliseconds', 'Speedtest current Jitter in ms')
     ping = Gauge('speedtest_ping_latency_milliseconds', 'Speedtest current Ping in ms')
     download_speed = Gauge('speedtest_download_bits_per_second', 'Speedtest current Download Speed in bit/s')
     upload_speed = Gauge('speedtest_upload_bits_per_second', 'Speedtest current Upload speed in bits/s')
-    run(int(args.port), int(args.interval))
+    PORT = os.getenv('SPEEDTEST_PORT', 9800)
+    SLEEP = os.getenv('SPEEDTEST_INTERVAL', 300)
+    run(int(PORT), int(SLEEP))
