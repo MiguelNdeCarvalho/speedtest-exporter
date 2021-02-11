@@ -86,7 +86,7 @@ if __name__ == '__main__':
     ping = Gauge('speedtest_ping_latency_milliseconds', 'Speedtest current Ping in ms')
     download_speed = Gauge('speedtest_download_bits_per_second', 'Speedtest current Download Speed in bit/s')
     upload_speed = Gauge('speedtest_upload_bits_per_second', 'Speedtest current Upload speed in bits/s')
-    PORT = os.getenv('SPEEDTEST_PORT', 9800)
+    PORT = os.getenv('SPEEDTEST_PORT', 9112)
     SLEEP = os.getenv('SPEEDTEST_INTERVAL', 300)
     
     app.run(host='0.0.0.0', port=PORT) # Start flask app
