@@ -88,4 +88,5 @@ if __name__ == '__main__':
     upload_speed = Gauge('speedtest_upload_bits_per_second', 'Speedtest current Upload speed in bits/s')
     PORT = os.getenv('SPEEDTEST_PORT', 9800)
     SLEEP = os.getenv('SPEEDTEST_INTERVAL', 300)
-    run(int(PORT), int(SLEEP))
+    
+    app.run(host='0.0.0.0', port=PORT) # Start flask app
