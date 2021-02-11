@@ -77,6 +77,7 @@ def mainPage():
 
 
 if __name__ == '__main__':
+    app = Flask("Speedtest-Exporter")
     # Create the Metrics
     server = Gauge('speedtest_server_id', 'Speedtest server ID used to test')
     jitter = Gauge('speedtest_jitter_latency_milliseconds', 'Speedtest current Jitter in ms')
