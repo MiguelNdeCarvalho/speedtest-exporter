@@ -3,7 +3,9 @@ import json
 import datetime
 import time
 import os
-from prometheus_client import start_http_server, Gauge
+from prometheus_client import make_wsgi_app, Gauge
+from flask import Flask
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 def bytes_to_bits(bytes_per_sec):
     return bytes_per_sec * 8
@@ -68,6 +70,8 @@ def run(http_port, sleep_time):
         if isinstance(test, tuple):
             update_results(test)
             time.sleep(sleep_time)
+
+
 
 if __name__ == '__main__':
     # Create the Metrics
