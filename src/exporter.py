@@ -7,6 +7,8 @@ from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
+app = Flask("Speedtest-Exporter") #Create flask app
+
 def bytes_to_bits(bytes_per_sec):
     return bytes_per_sec * 8
 
@@ -77,7 +79,7 @@ def mainPage():
 
 
 if __name__ == '__main__':
-    app = Flask("Speedtest-Exporter")
+    
     # Create the Metrics
     server = Gauge('speedtest_server_id', 'Speedtest server ID used to test')
     jitter = Gauge('speedtest_jitter_latency_milliseconds', 'Speedtest current Jitter in ms')
