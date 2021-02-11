@@ -71,6 +71,9 @@ def run(http_port, sleep_time):
             update_results(test)
             time.sleep(sleep_time)
 
+@app.route("/")
+def mainPage():
+    return "<h1>Welcome to Speedtest-Exporter.</h1>Click <a href='/metrics'>here</a> to see metrics."
 
 
 if __name__ == '__main__':
