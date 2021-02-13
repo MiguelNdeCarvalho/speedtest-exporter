@@ -26,6 +26,4 @@ pcre-dev
 
 USER speedtest
 
-EXPOSE 9800
-
 CMD uwsgi --http :9112 --plugin python --wsgi-file exporter.py --callable app
