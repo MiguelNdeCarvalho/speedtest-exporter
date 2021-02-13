@@ -23,21 +23,15 @@ def is_json(myjson):
         return False
     return True
 
-def run_speedtest():
-    print('Starting speedtest')
-    cmd = ["speedtest", "--format=json-pretty", "--progress=no", "--accept-license", "--accept-gdpr"]
-    server = os.environ.get('SPEEDTEST_SERVER')
-    if server:
-        if server.isnumeric():
-            print("Using custom server ID: "+str(server))
-            cmd.append("--server-id=" + str(server))
-
-    while True:
-        try:
-            output = subprocess.check_output(cmd)
-        except subprocess.CalledProcessError as e:
-            output = e.output
-        if is_json(output):
+def runTest():
+    
+    serverID = os.environ.get('SPEEDTEST_SERVER');
+    if serverID:
+        cmd = ["speedtest", "--format=json-pretty", "--progress=no", "--accept-license", "--accept-gdpr", "--server-id=", str(serverID)]
+    else:
+        cmd = ["speedtest", "--format=json-pretty", "--progress=no", "--accept-license", "--accept-gdpr"]
+    output = subprocess.check_output(cmd)
+    if is_json(output):
             data = json.loads(output)
             if "error" in data:
                 # If we get here it probably means that socket timed out(Network issues?)
@@ -55,23 +49,18 @@ def run_speedtest():
                     upload = bytes_to_bits(data['upload']['bandwidth'])
                     return (actual_server, actual_jitter, actual_ping, download, upload)
 
-def update_results(test_done):
-    server.set(test_done[0]) 
-    jitter.set(test_done[1])
-    ping.set(test_done[2])
-    download_speed.set(test_done[3])
-    upload_speed.set(test_done[4])
-    current_dt = datetime.datetime.now()
-    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: " + str(test_done[0]) + " | Jitter: " + str(test_done[1]) + " ms | Ping: " + str(test_done[2]) + " ms | Download: " + bits_to_megabits(test_done[3]) + " | Upload:" + bits_to_megabits(test_done[4]))
+@app.route("/metrics")
+def updateResults():
+    results =runTest()
 
-def run(http_port, sleep_time):
-    start_http_server(http_port)
-    print("Successfully started Speedtest Exporter on http://localhost:" + str(http_port))
-    while True:
-        test = run_speedtest()
-        if isinstance(test, tuple):
-            update_results(test)
-            time.sleep(sleep_time)
+    server.set(results[0]) 
+    jitter.set(results[1])
+    ping.set(results[2])
+    download_speed.set(results[3])
+    upload_speed.set(results[4])
+    current_dt = datetime.datetime.now()
+    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: " + str(results[0]) + " | Jitter: " + str(results[1]) + " ms | Ping: " + str(results[2]) + " ms | Download: " + bits_to_megabits(results[3]) + " | Upload:" + bits_to_megabits(results[4]))
+    return make_wsgi_app()
 
 @app.route("/")
 def mainPage():
