@@ -9,6 +9,13 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 app = Flask("Speedtest-Exporter") #Create flask app
 
+# Create Metrics
+server = Gauge('speedtest_server_id', 'Speedtest server ID used to test')
+jitter = Gauge('speedtest_jitter_latency_milliseconds', 'Speedtest current Jitter in ms')
+ping = Gauge('speedtest_ping_latency_milliseconds', 'Speedtest current Ping in ms')
+download_speed = Gauge('speedtest_download_bits_per_second', 'Speedtest current Download Speed in bit/s')
+upload_speed = Gauge('speedtest_upload_bits_per_second', 'Speedtest current Upload speed in bits/s')
+
 def bytes_to_bits(bytes_per_sec):
     return bytes_per_sec * 8
 
@@ -68,13 +75,5 @@ def mainPage():
 
 
 if __name__ == '__main__':
-    
-    # Create the Metrics
-    server = Gauge('speedtest_server_id', 'Speedtest server ID used to test')
-    jitter = Gauge('speedtest_jitter_latency_milliseconds', 'Speedtest current Jitter in ms')
-    ping = Gauge('speedtest_ping_latency_milliseconds', 'Speedtest current Ping in ms')
-    download_speed = Gauge('speedtest_download_bits_per_second', 'Speedtest current Download Speed in bit/s')
-    upload_speed = Gauge('speedtest_upload_bits_per_second', 'Speedtest current Upload speed in bits/s')
     PORT = os.getenv('SPEEDTEST_PORT', 9112)
-    
     app.run(host='0.0.0.0', port=PORT) # Start flask app
