@@ -6,7 +6,9 @@ WORKDIR /app
 COPY src/. .
 
 RUN adduser -D speedtest
-RUN pip install -r requirements.txt && \
+RUN apk --no-cache add uwsgi-python3 python3-dev build-base linux-headers pcre-dev
+RUN pip install uwsgi && \
+    pip install -r requirements.txt && \
     export ARCHITECTURE=$(uname -m) && \
     if [ "$ARCHITECTURE" == 'armv7l' ]; then export ARCHITECTURE=arm; fi && \
     wget -O /tmp/speedtest.tgz "https://bintray.com/ookla/download/download_file?file_path=ookla-speedtest-1.0.0-${ARCHITECTURE}-linux.tgz" && \
@@ -16,8 +18,14 @@ RUN pip install -r requirements.txt && \
     rm requirements.txt
 
 RUN chown -R speedtest:speedtest /app
+
+RUN apk del --purge python3-dev \ 
+build-base \
+linux-headers \
+pcre-dev
+
 USER speedtest
 
 EXPOSE 9800
 
-CMD [ "python", "-u", "exporter.py" ]
+CMD uwsgi --http :9112 --plugin python --wsgi-file exporter.py --callable app
