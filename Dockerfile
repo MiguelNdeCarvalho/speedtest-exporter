@@ -26,4 +26,4 @@ pcre-dev
 
 USER speedtest
 
-CMD uwsgi --http :9112 --plugin python --wsgi-file exporter.py --callable app
+CMD uwsgi --http :${SPEEDTEST_PORT:=9800}} --plugin python --wsgi-file exporter.py --callable app
