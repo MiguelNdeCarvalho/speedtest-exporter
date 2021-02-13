@@ -72,5 +72,5 @@ def mainPage():
 
 
 if __name__ == '__main__':
-    PORT = os.getenv('SPEEDTEST_PORT', 9112)
+    PORT = os.getenv('SPEEDTEST_PORT', 9800)
     app.run(host='0.0.0.0', port=PORT) # Start flask app
