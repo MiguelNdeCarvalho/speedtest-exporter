@@ -31,12 +31,10 @@ def is_json(myjson):
     return True
 
 def runTest():
-    
-    serverID = os.environ.get('SPEEDTEST_SERVER');
+    serverID = os.environ.get('SPEEDTEST_SERVER')
+    cmd = ["speedtest", "--format=json-pretty", "--progress=no", "--accept-license", "--accept-gdpr"]
     if serverID:
-        cmd = ["speedtest", "--format=json-pretty", "--progress=no", "--accept-license", "--accept-gdpr", "--server-id=", str(serverID)]
-    else:
-        cmd = ["speedtest", "--format=json-pretty", "--progress=no", "--accept-license", "--accept-gdpr"]
+        cmd.append(f"--server-id={serverID}")
     output = subprocess.check_output(cmd)
     if is_json(output):
             data = json.loads(output)
@@ -58,15 +56,14 @@ def runTest():
 
 @app.route("/metrics")
 def updateResults():
-    results =runTest()
-
-    server.set(results[0]) 
-    jitter.set(results[1])
-    ping.set(results[2])
-    download_speed.set(results[3])
-    upload_speed.set(results[4])
+    r_server, r_jitter, r_ping, r_download, r_upload = runTest()
+    server.set(r_server)
+    jitter.set(r_jitter)
+    ping.set(r_ping)
+    download_speed.set(r_download)
+    upload_speed.set(r_upload)
     current_dt = datetime.datetime.now()
-    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: " + str(results[0]) + " | Jitter: " + str(results[1]) + " ms | Ping: " + str(results[2]) + " ms | Download: " + bits_to_megabits(results[3]) + " | Upload:" + bits_to_megabits(results[4]))
+    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: " + str(r_server) + " | Jitter: " + str(r_jitter) + " ms | Ping: " + str(r_ping) + " ms | Download: " + bits_to_megabits(r_download) + " | Upload:" + bits_to_megabits(r_upload))
     return make_wsgi_app()
 
 @app.route("/")
