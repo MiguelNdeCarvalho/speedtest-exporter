@@ -20,9 +20,11 @@ RUN pip install uwsgi && \
 RUN chown -R speedtest:speedtest /app
 
 RUN apk del --purge python3-dev \ 
-build-base \
-linux-headers \
-pcre-dev
+    build-base \
+    linux-headers \
+    pcre-dev && rm -rf \
+	/root/.cache \
+    /tmp/*
 
 USER speedtest
 
