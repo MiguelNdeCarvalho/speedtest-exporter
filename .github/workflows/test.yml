@@ -20,8 +20,8 @@ jobs:
       - name: Lint Code Base
         uses: github/super-linter@v3
         env:
-          VALIDATE_PYTHON: "true"
-          VALIDATE_DOCKERFILE: "true"
+          VALIDATE_PYTHON: true
+          VALIDATE_DOCKERFILE: true
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   build-image:
