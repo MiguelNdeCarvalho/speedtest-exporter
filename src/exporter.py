@@ -18,12 +18,15 @@ download_speed = Gauge('speedtest_download_bits_per_second',
 upload_speed = Gauge('speedtest_upload_bits_per_second',
                      'Speedtest current Upload speed in bits/s')
 
+
 def bytes_to_bits(bytes_per_sec):
     return bytes_per_sec * 8
+
 
 def bits_to_megabits(bits_per_sec):
     megabits = round(bits_per_sec * (10**-6),2)
     return str(megabits) + " Mb/s"
+
 
 def is_json(myjson):
     try:
@@ -31,6 +34,7 @@ def is_json(myjson):
     except ValueError as e:
         return False
     return True
+
 
 def runTest():
     serverID = os.environ.get('SPEEDTEST_SERVER')
@@ -57,6 +61,7 @@ def runTest():
                     upload = bytes_to_bits(data['upload']['bandwidth'])
                     return (actual_server, actual_jitter, actual_ping, download, upload)
 
+
 @app.route("/metrics")
 def updateResults():
     r_server, r_jitter, r_ping, r_download, r_upload = runTest()
@@ -68,6 +73,7 @@ def updateResults():
     current_dt = datetime.datetime.now()
     print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: " + str(r_server) + " | Jitter: " + str(r_jitter) + " ms | Ping: " + str(r_ping) + " ms | Download: " + bits_to_megabits(r_download) + " | Upload:" + bits_to_megabits(r_upload))
     return make_wsgi_app()
+
 
 @app.route("/")
 def mainPage():
