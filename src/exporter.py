@@ -17,6 +17,7 @@ download_speed = Gauge('speedtest_download_bits_per_second',
                        'Speedtest current Download Speed in bit/s')
 upload_speed = Gauge('speedtest_upload_bits_per_second',
                      'Speedtest current Upload speed in bits/s')
+up = Gauge('speedtest_up', 'Speedtest status whether the scrape worked')
 
 
 def bytes_to_bits(bytes_per_sec):
@@ -49,7 +50,7 @@ def runTest():
             # Socket error
             print('Something went wrong')
             print(data['error'])
-            return None
+            return (0, 0, 0, 0, 0, 0)  # Return all data as 0
         if "type" in data:
             if data['type'] == 'log':
                 print(str(data["timestamp"]) + " - " + str(data["message"]))
@@ -60,17 +61,18 @@ def runTest():
                 download = bytes_to_bits(data['download']['bandwidth'])
                 upload = bytes_to_bits(data['upload']['bandwidth'])
                 return (actual_server, actual_jitter,
-                        actual_ping, download, upload)
+                        actual_ping, download, upload, 1)
 
 
 @app.route("/metrics")
 def updateResults():
-    r_server, r_jitter, r_ping, r_download, r_upload = runTest()
+    r_server, r_jitter, r_ping, r_download, r_upload, r_status = runTest()
     server.set(r_server)
     jitter.set(r_jitter)
     ping.set(r_ping)
     download_speed.set(r_download)
     upload_speed.set(r_upload)
+    up.set(r_status)
     current_dt = datetime.datetime.now()
     print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: "
           + str(r_server) + " | Jitter: " + str(r_jitter) + " ms | Ping: "
