@@ -25,6 +25,7 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   build-image:
+    name: Build Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
