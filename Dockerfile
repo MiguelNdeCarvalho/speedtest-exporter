@@ -14,7 +14,6 @@ RUN pip install uwsgi && \
     wget -O /tmp/speedtest.tgz "https://bintray.com/ookla/download/download_file?file_path=ookla-speedtest-1.0.0-${ARCHITECTURE}-linux.tgz" && \
     tar zxvf /tmp/speedtest.tgz -C /tmp && \
     cp /tmp/speedtest /usr/local/bin && \
-    rm -rf /tmp/* && \
     rm requirements.txt
 
 RUN chown -R speedtest:speedtest /app
