@@ -5,7 +5,7 @@ import os
 from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
 
-app = Flask("Speedtest-Exporter") #Create flask app
+app = Flask("Speedtest-Exporter")  # Create flask app
 
 # Create Metrics
 server = Gauge('speedtest_server_id', 'Speedtest server ID used to test')
@@ -71,4 +71,4 @@ def mainPage():
 
 if __name__ == '__main__':
     PORT = os.getenv('SPEEDTEST_PORT', 9798)
-    app.run(host='0.0.0.0', port=PORT) # Start flask app
+    app.run(host='0.0.0.0', port=PORT)  # Start flask app
