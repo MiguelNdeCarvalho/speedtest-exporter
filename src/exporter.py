@@ -1,11 +1,9 @@
 import subprocess
 import json
 import datetime
-import time
 import os
 from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 app = Flask("Speedtest-Exporter") #Create flask app
 
