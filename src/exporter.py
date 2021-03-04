@@ -46,7 +46,7 @@ def runTest():
     if is_json(output):
         data = json.loads(output)
         if "error" in data:
-            # If we get here it probably means that socket timed out(Network issues?)
+            # Socket error
             print('Something went wrong')
             print(data['error'])
             return None
@@ -59,7 +59,8 @@ def runTest():
                 actual_ping = data['ping']['latency']
                 download = bytes_to_bits(data['download']['bandwidth'])
                 upload = bytes_to_bits(data['upload']['bandwidth'])
-                return (actual_server, actual_jitter, actual_ping, download, upload)
+                return (actual_server, actual_jitter,
+                        actual_ping, download, upload)
 
 
 @app.route("/metrics")
@@ -71,13 +72,17 @@ def updateResults():
     download_speed.set(r_download)
     upload_speed.set(r_upload)
     current_dt = datetime.datetime.now()
-    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: " + str(r_server) + " | Jitter: " + str(r_jitter) + " ms | Ping: " + str(r_ping) + " ms | Download: " + bits_to_megabits(r_download) + " | Upload:" + bits_to_megabits(r_upload))
+    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: "
+          + str(r_server) + " | Jitter: " + str(r_jitter) + " ms | Ping: "
+          + str(r_ping) + " ms | Download: " + bits_to_megabits(r_download)
+          + " | Upload:" + bits_to_megabits(r_upload))
     return make_wsgi_app()
 
 
 @app.route("/")
 def mainPage():
-    return "<h1>Welcome to Speedtest-Exporter.</h1>Click <a href='/metrics'>here</a> to see metrics."
+    return ("<h1>Welcome to Speedtest-Exporter.</h1>" +
+            "Click <a href='/metrics'>here</a> to see metrics.")
 
 
 if __name__ == '__main__':
