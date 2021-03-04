@@ -45,6 +45,4 @@ jobs:
           push: false
           tags: | 
             miguelndecarvalho/speedtest-exporter:latest
-            miguelndecarvalho/speedtest-exporter:${{ steps.tag.outputs.tag }}
             ghcr.io/miguelndecarvalho/speedtest-exporter:latest
-            ghcr.io/miguelndecarvalho/speedtest-exporter:${{ steps.tag.outputs.tag }}
