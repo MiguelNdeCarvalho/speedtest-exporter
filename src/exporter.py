@@ -4,6 +4,7 @@ import datetime
 import os
 from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
+from waitress import serve
 
 app = Flask("Speedtest-Exporter")  # Create flask app
 
@@ -89,4 +90,4 @@ def mainPage():
 
 if __name__ == '__main__':
     PORT = os.getenv('SPEEDTEST_PORT', 9798)
-    app.run(host='0.0.0.0', port=PORT)  # Start flask app
+    serve(app, host='0.0.0.0', port=PORT)
