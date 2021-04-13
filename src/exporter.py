@@ -52,7 +52,7 @@ def runTest():
             if len(output) > 0:
                 print('Speedtest CLI Error occured that was not in JSON format')
                 print(output)
-            return (0,0,0,0,0,0)
+            return (0, 0, 0, 0, 0, 0)
     if is_json(output):
         data = json.loads(output)
         if "error" in data:
