@@ -2,3 +2,4 @@ Werkzeug==1.0.1
 Flask==1.1.2
 prometheus_client==0.10.1
 waitress==2.0.0
+speedtest-cli==2.1.3
