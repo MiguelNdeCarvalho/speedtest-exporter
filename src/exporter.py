@@ -40,10 +40,9 @@ def is_json(myjson):
 
 def runTest():
     serverID = os.environ.get('SPEEDTEST_SERVER')
-    cmd = ["speedtest", "--format=json-pretty", "--progress=no",
-           "--accept-license", "--accept-gdpr"]
+    cmd = ["speedtest", "--json"]
     if serverID:
-        cmd.append(f"--server-id={serverID}")
+        cmd.append(f"--server {serverID}")
     output = subprocess.check_output(cmd)
     if is_json(output):
         data = json.loads(output)
@@ -67,7 +66,27 @@ def runTest():
 
 @app.route("/metrics")
 def updateResults():
-    r_server, r_jitter, r_ping, r_download, r_upload, r_status = runTest()
+
+    serverID = os.environ.get('SPEEDTEST_SERVER')
+    cmd = ["speedtest", "--json"]
+    if serverID:
+        cmd.append(f"--server {serverID}")
+    output = subprocess.check_output(cmd)
+    if is_json(output):
+        data = json.loads(output)
+        if "error" in data:
+            # Socket error
+            print('Something went wrong')
+            print(data['error'])
+            return (0, 0, 0, 0, 0, 0)  # Return all data as 0
+        if "download" in data:
+            r_server = int(data['server']['id'])
+            r_jitter = 0 # data['ping']['jitter']
+            r_ping = data['ping']
+            r_download = data['download']
+            r_upload = data['upload']
+            r_status = 1
+
     server.set(r_server)
     jitter.set(r_jitter)
     ping.set(r_ping)
