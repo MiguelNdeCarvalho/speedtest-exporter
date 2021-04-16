@@ -37,33 +37,6 @@ def is_json(myjson):
         return False
     return True
 
-
-def runTest():
-    serverID = os.environ.get('SPEEDTEST_SERVER')
-    cmd = ["speedtest", "--json"]
-    if serverID:
-        cmd.append(f"--server {serverID}")
-    output = subprocess.check_output(cmd)
-    if is_json(output):
-        data = json.loads(output)
-        if "error" in data:
-            # Socket error
-            print('Something went wrong')
-            print(data['error'])
-            return (0, 0, 0, 0, 0, 0)  # Return all data as 0
-        if "type" in data:
-            if data['type'] == 'log':
-                print(str(data["timestamp"]) + " - " + str(data["message"]))
-            if data['type'] == 'result':
-                actual_server = int(data['server']['id'])
-                actual_jitter = data['ping']['jitter']
-                actual_ping = data['ping']['latency']
-                download = bytes_to_bits(data['download']['bandwidth'])
-                upload = bytes_to_bits(data['upload']['bandwidth'])
-                return (actual_server, actual_jitter,
-                        actual_ping, download, upload, 1)
-
-
 @app.route("/metrics")
 def updateResults():
 
