@@ -44,7 +44,15 @@ def runTest():
            "--accept-license", "--accept-gdpr"]
     if serverID:
         cmd.append(f"--server-id={serverID}")
-    output = subprocess.check_output(cmd)
+    try:
+        output = subprocess.check_output(cmd)
+    except subprocess.CalledProcessError as e:
+        output = e.output
+        if not is_json(output):
+            if len(output) > 0:
+                print('Speedtest CLI Error occured that was not in JSON format')
+                print(output)
+            return (0, 0, 0, 0, 0, 0)
     if is_json(output):
         data = json.loads(output)
         if "error" in data:
