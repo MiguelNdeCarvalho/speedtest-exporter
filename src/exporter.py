@@ -90,4 +90,5 @@ def mainPage():
 
 if __name__ == '__main__':
     PORT = os.getenv('SPEEDTEST_PORT', 9798)
+    print("Starting Speedtest-Exporter on http://localhost:" + str(PORT))
     serve(app, host='0.0.0.0', port=PORT)
