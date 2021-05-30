@@ -1,4 +1,4 @@
 Werkzeug==2.0.1
-Flask==2.0.0
+Flask==2.0.1
 prometheus_client==0.10.1
 waitress==2.0.0
