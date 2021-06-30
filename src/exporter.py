@@ -7,7 +7,9 @@ from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
 from waitress import serve
 
-logging.basicConfig(filename='speedtest.log', encoding='utf-8', level=logging.DEBUG)
+format_string = '%(levelname)s: %(asctime)s: %(message)s''
+logging.basicConfig(filename='speedtest.log', encoding='utf-8', level=logging.DEBUG, format=format_string)
+
 app = Flask("Speedtest-Exporter")  # Create flask app
 
 # Create Metrics
@@ -87,8 +89,8 @@ def updateResults():
     upload_speed.set(r_upload)
     up.set(r_status)
     current_dt = datetime.datetime.now()
-    logging.info(current_dt.strftime("%Y-%m-%d %H:%M:%S")
-          + " Server=" + str(r_server)
+    logging.info(
+          " Server=" + str(r_server)
           + " Jitter=" + str(r_jitter) + " ms"
           + " Ping=" + str(r_ping) + " ms"
           + " Download=" + bits_to_megabits(r_download)
