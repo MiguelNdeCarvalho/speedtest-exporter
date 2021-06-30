@@ -1,11 +1,13 @@
-import subprocess
-import json
 import datetime
+import json
+import logging
 import os
+import subprocess
 from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
 from waitress import serve
 
+logging.basicConfig(filename='speedtest.log', encoding='utf-8', level=logging.DEBUG)
 app = Flask("Speedtest-Exporter")  # Create flask app
 
 # Create Metrics
@@ -70,13 +72,14 @@ def runTest():
                 actual_ping = data['ping']['latency']
                 download = bytes_to_bits(data['download']['bandwidth'])
                 upload = bytes_to_bits(data['upload']['bandwidth'])
+                result_url = data['result']['url']
                 return (actual_server, actual_jitter,
-                        actual_ping, download, upload, 1)
+                        actual_ping, download, upload, result_url, 1)
 
 
 @app.route("/metrics")
 def updateResults():
-    r_server, r_jitter, r_ping, r_download, r_upload, r_status = runTest()
+    r_server, r_jitter, r_ping, r_download, r_upload,  r_url, r_status = runTest()
     server.set(r_server)
     jitter.set(r_jitter)
     ping.set(r_ping)
@@ -84,10 +87,14 @@ def updateResults():
     upload_speed.set(r_upload)
     up.set(r_status)
     current_dt = datetime.datetime.now()
-    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: "
-          + str(r_server) + " | Jitter: " + str(r_jitter) + " ms | Ping: "
-          + str(r_ping) + " ms | Download: " + bits_to_megabits(r_download)
-          + " | Upload:" + bits_to_megabits(r_upload))
+    logging.info(current_dt.strftime("%Y-%m-%d %H:%M:%S")
+          + " Server=" + str(r_server)
+          + " Jitter=" + str(r_jitter) + " ms"
+          + " Ping=" + str(r_ping) + " ms"
+          + " Download=" + bits_to_megabits(r_download)
+          + " Upload=" + bits_to_megabits(r_upload)
+          + " Url=" + r_url
+        )
     return make_wsgi_app()
 
 
