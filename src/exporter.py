@@ -3,11 +3,12 @@ import json
 import logging
 import os
 import subprocess
+import time
 from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
 from waitress import serve
 
-format_string = '%(levelname)s: %(asctime)s: %(message)s''
+format_string = 'level=%(levelname)s datetime=%(asctime)s %(message)s'
 logging.basicConfig(filename='speedtest.log', encoding='utf-8', level=logging.DEBUG, format=format_string)
 
 app = Flask("Speedtest-Exporter")  # Create flask app
@@ -88,11 +89,11 @@ def updateResults():
     download_speed.set(r_download)
     upload_speed.set(r_upload)
     up.set(r_status)
-    current_dt = datetime.datetime.now()
     logging.info(
-          " Server=" + str(r_server)
-          + " Jitter=" + str(r_jitter) + " ms"
-          + " Ping=" + str(r_ping) + " ms"
+          "time=" + str(time.time())
+          + " Server=" + str(r_server)
+          + " Jitter=" + str(r_jitter) + "ms"
+          + " Ping=" + str(r_ping) + "ms"
           + " Download=" + bits_to_megabits(r_download)
           + " Upload=" + bits_to_megabits(r_upload)
           + " Url=" + r_url
