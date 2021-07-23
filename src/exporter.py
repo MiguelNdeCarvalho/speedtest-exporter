@@ -40,12 +40,14 @@ def is_json(myjson):
 
 def runTest():
     serverID = os.environ.get('SPEEDTEST_SERVER')
+    timeout = int(os.environ.get('SPEEDTEST_TIMEOUT', 90))
+
     cmd = ["speedtest", "--format=json-pretty", "--progress=no",
            "--accept-license", "--accept-gdpr"]
     if serverID:
         cmd.append(f"--server-id={serverID}")
     try:
-        output = subprocess.check_output(cmd)
+        output = subprocess.check_output(cmd, timeout=timeout)
     except subprocess.CalledProcessError as e:
         output = e.output
         if not is_json(output):
@@ -54,6 +56,11 @@ def runTest():
                       'was not in JSON format')
                 print(output)
             return (0, 0, 0, 0, 0, 0)
+    except subprocess.TimeoutExpired:
+        print('Speedtest CLI process took too long to complete ' +
+              'and was killed.')
+        return (0, 0, 0, 0, 0, 0)
+
     if is_json(output):
         data = json.loads(output)
         if "error" in data:
