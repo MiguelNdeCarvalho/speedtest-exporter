@@ -40,21 +40,14 @@ def is_json(myjson):
 
 def runTest():
     serverID = os.environ.get('SPEEDTEST_SERVER')
-
-    # Defaults to None if not set
-    process_timeout = os.environ.get('SPEEDTEST_TIMEOUT')
-
-    try:
-        process_timeout = int(process_timeout)
-    except Exception:
-        process_timeout = None
+    timeout = int(os.environ.get('SPEEDTEST_TIMEOUT', 90))
 
     cmd = ["speedtest", "--format=json-pretty", "--progress=no",
            "--accept-license", "--accept-gdpr"]
     if serverID:
         cmd.append(f"--server-id={serverID}")
     try:
-        output = subprocess.check_output(cmd, timeout=process_timeout)
+        output = subprocess.check_output(cmd, timeout=timeout)
     except subprocess.CalledProcessError as e:
         output = e.output
         if not is_json(output):
