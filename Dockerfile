@@ -8,7 +8,7 @@ WORKDIR /app
 COPY src/. .
 
 RUN adduser -D speedtest
-RUN pip install -r requirements.txt && \
+RUN pip install --no-cache-dir -r requirements.txt && \
     export ARCHITECTURE=$(uname -m) && \
     if [ "$ARCHITECTURE" == 'armv7l' ]; then export ARCHITECTURE=armhf; fi && \
     wget -O /tmp/speedtest.tgz "https://install.speedtest.net/app/cli/ookla-speedtest-${VERSION}-linux-${ARCHITECTURE}.tgz" && \
