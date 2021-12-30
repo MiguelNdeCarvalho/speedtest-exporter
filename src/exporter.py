@@ -1,12 +1,23 @@
 import subprocess
 import json
-import datetime
 import os
+import logging
 from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
 from waitress import serve
 
 app = Flask("Speedtest-Exporter")  # Create flask app
+
+
+# Setup logging values
+format_string = 'level=%(levelname)s datetime=%(asctime)s %(message)s'
+logging.basicConfig(encoding='utf-8', level=logging.DEBUG,
+                    format=format_string)
+
+# Disable Waitress Logs
+log = logging.getLogger('waitress')
+log.disabled = True
+
 
 # Create Metrics
 server = Gauge('speedtest_server_id', 'Speedtest server ID used to test')
@@ -27,7 +38,7 @@ def bytes_to_bits(bytes_per_sec):
 
 def bits_to_megabits(bits_per_sec):
     megabits = round(bits_per_sec * (10**-6), 2)
-    return str(megabits) + " Mb/s"
+    return str(megabits) + "Mbps"
 
 
 def is_json(myjson):
@@ -52,13 +63,12 @@ def runTest():
         output = e.output
         if not is_json(output):
             if len(output) > 0:
-                print('Speedtest CLI Error occurred that' +
-                      'was not in JSON format')
-                print(output)
+                logging.error('Speedtest CLI Error occurred that' +
+                              'was not in JSON format')
             return (0, 0, 0, 0, 0, 0)
     except subprocess.TimeoutExpired:
-        print('Speedtest CLI process took too long to complete ' +
-              'and was killed.')
+        logging.error('Speedtest CLI process took too long to complete ' +
+                      'and was killed.')
         return (0, 0, 0, 0, 0, 0)
 
     if is_json(output):
@@ -90,11 +100,13 @@ def updateResults():
     download_speed.set(r_download)
     upload_speed.set(r_upload)
     up.set(r_status)
-    current_dt = datetime.datetime.now()
-    print(current_dt.strftime("%d/%m/%Y %H:%M:%S - ") + "Server: "
-          + str(r_server) + " | Jitter: " + str(r_jitter) + " ms | Ping: "
-          + str(r_ping) + " ms | Download: " + bits_to_megabits(r_download)
-          + " | Upload:" + bits_to_megabits(r_upload))
+    logging.info(
+          "Server=" + str(r_server)
+          + " Jitter=" + str(r_jitter) + "ms"
+          + " Ping=" + str(r_ping) + "ms"
+          + " Download=" + bits_to_megabits(r_download)
+          + " Upload=" + bits_to_megabits(r_upload)
+        )
     return make_wsgi_app()
 
 
@@ -106,5 +118,5 @@ def mainPage():
 
 if __name__ == '__main__':
     PORT = os.getenv('SPEEDTEST_PORT', 9798)
-    print("Starting Speedtest-Exporter on http://localhost:" + str(PORT))
+    logging.info("Starting Speedtest-Exporter on http://localhost:" + str(PORT))
     serve(app, host='0.0.0.0', port=PORT)
