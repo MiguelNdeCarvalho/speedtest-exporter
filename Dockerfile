@@ -1,7 +1,7 @@
 FROM python:3.10.1-alpine3.15
 
 # Speedtest CLI Version
-ENV VERSION=1.1.1
+ARG SPEEDTEST_VERSION=1.1.1
 
 WORKDIR /app
 
