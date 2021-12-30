@@ -2,7 +2,6 @@ import subprocess
 import json
 import os
 import logging
-import time
 from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
 from waitress import serve
