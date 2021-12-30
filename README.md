@@ -5,6 +5,10 @@ official CLI from **Ookla**
 
 You can get all the documentation [here](https://docs.miguelndecarvalho.pt/projects/speedtest-exporter/)
 
+## Screenshot
+
+![Grafana](/screenshot.png)
+
 ## Thanks to
 
 - [Nils Müller](https://github.com/tyriis)

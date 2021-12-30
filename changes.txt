@@ -1,0 +1,5 @@
+- Use python:3.10-slim
+- Include Packet Loss metric (speedtest_packet_loss)
+- Remove speedtest_server_id metric and Add server_id to the metric label
+- Use logging for debug/info (SPEEDTEST_LOG_LEVEL)
+- Add /health
