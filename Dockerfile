@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt && \
     ARCHITECTURE=$(uname -m) && \
     export ARCHITECTURE && \
     if [ "$ARCHITECTURE" = 'armv7l' ];then ARCHITECTURE="armhf";fi && \
-    wget -O /tmp/speedtest.tgz "https://install.speedtest.net/app/cli/ookla-speedtest-${SPEEDTEST_VERSION}-linux-${ARCHITECTURE}.tgz" && \
+    wget --progress=dot:giga -O /tmp/speedtest.tgz "https://install.speedtest.net/app/cli/ookla-speedtest-${SPEEDTEST_VERSION}-linux-${ARCHITECTURE}.tgz" && \
     tar zxvf /tmp/speedtest.tgz -C /tmp && \
     cp /tmp/speedtest /usr/local/bin && \
     chown -R speedtest:speedtest /app && \
