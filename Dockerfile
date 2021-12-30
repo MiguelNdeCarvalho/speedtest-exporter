@@ -12,7 +12,7 @@ COPY src/. .
 # Install required modules and Speedtest CLI
 RUN pip install --no-cache-dir -r requirements.txt && \
     export ARCHITECTURE=$(uname -m) && \
-    if [ "$ARCHITECTURE" == 'armv7l' ]; then export ARCHITECTURE=armhf; fi && \
+    if [ "$ARCHITECTURE" = 'armv7l' ]; then export ARCHITECTURE=armhf; fi && \
     wget -O /tmp/speedtest.tgz "https://install.speedtest.net/app/cli/ookla-speedtest-${SPEEDTEST_VERSION}-linux-${ARCHITECTURE}.tgz" && \
     tar zxvf /tmp/speedtest.tgz -C /tmp && \
     cp /tmp/speedtest /usr/local/bin && \
