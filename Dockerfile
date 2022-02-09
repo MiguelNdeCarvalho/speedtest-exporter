@@ -7,7 +7,7 @@ ARG SPEEDTEST_VERSION=1.1.1
 RUN adduser -D speedtest
 
 WORKDIR /app
-COPY src/. .
+COPY src/requirements.txt .
 
 # Install required modules and Speedtest CLI
 RUN pip install --no-cache-dir -r requirements.txt && \
@@ -21,6 +21,8 @@ RUN pip install --no-cache-dir -r requirements.txt && \
     rm -rf \
      /tmp/* \
      /app/requirements
+
+COPY src/. .
 
 USER speedtest
 
