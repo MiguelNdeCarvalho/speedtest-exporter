@@ -2,22 +2,22 @@ import subprocess
 import json
 import os
 import logging
+import datetime
 from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
 from waitress import serve
 
 app = Flask("Speedtest-Exporter")  # Create flask app
 
-
 # Setup logging values
 format_string = 'level=%(levelname)s datetime=%(asctime)s %(message)s'
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG,
+logging.basicConfig(encoding='utf-8',
+                    level=logging.DEBUG,
                     format=format_string)
 
 # Disable Waitress Logs
 log = logging.getLogger('waitress')
 log.disabled = True
-
 
 # Create Metrics
 server = Gauge('speedtest_server_id', 'Speedtest server ID used to test')
@@ -30,6 +30,10 @@ download_speed = Gauge('speedtest_download_bits_per_second',
 upload_speed = Gauge('speedtest_upload_bits_per_second',
                      'Speedtest current Upload speed in bits/s')
 up = Gauge('speedtest_up', 'Speedtest status whether the scrape worked')
+
+# Cache metrics for how long (seconds)?
+cache_seconds = int(os.environ.get('SPEEDTEST_CACHE_FOR', 0))
+cache_until = datetime.datetime.fromtimestamp(0)
 
 
 def bytes_to_bits(bytes_per_sec):
@@ -53,8 +57,10 @@ def runTest():
     serverID = os.environ.get('SPEEDTEST_SERVER')
     timeout = int(os.environ.get('SPEEDTEST_TIMEOUT', 90))
 
-    cmd = ["speedtest", "--format=json-pretty", "--progress=no",
-           "--accept-license", "--accept-gdpr"]
+    cmd = [
+        "speedtest", "--format=json-pretty", "--progress=no",
+        "--accept-license", "--accept-gdpr"
+    ]
     if serverID:
         cmd.append(f"--server-id={serverID}")
     try:
@@ -87,26 +93,30 @@ def runTest():
                 actual_ping = data['ping']['latency']
                 download = bytes_to_bits(data['download']['bandwidth'])
                 upload = bytes_to_bits(data['upload']['bandwidth'])
-                return (actual_server, actual_jitter,
-                        actual_ping, download, upload, 1)
+                return (actual_server, actual_jitter, actual_ping, download,
+                        upload, 1)
 
 
 @app.route("/metrics")
 def updateResults():
-    r_server, r_jitter, r_ping, r_download, r_upload, r_status = runTest()
-    server.set(r_server)
-    jitter.set(r_jitter)
-    ping.set(r_ping)
-    download_speed.set(r_download)
-    upload_speed.set(r_upload)
-    up.set(r_status)
-    logging.info(
-          "Server=" + str(r_server)
-          + " Jitter=" + str(r_jitter) + "ms"
-          + " Ping=" + str(r_ping) + "ms"
-          + " Download=" + bits_to_megabits(r_download)
-          + " Upload=" + bits_to_megabits(r_upload)
-        )
+    global cache_until
+
+    if datetime.datetime.now() > cache_until:
+        r_server, r_jitter, r_ping, r_download, r_upload, r_status = runTest()
+        server.set(r_server)
+        jitter.set(r_jitter)
+        ping.set(r_ping)
+        download_speed.set(r_download)
+        upload_speed.set(r_upload)
+        up.set(r_status)
+        logging.info("Server=" + str(r_server) + " Jitter=" + str(r_jitter) +
+                     "ms" + " Ping=" + str(r_ping) + "ms" + " Download=" +
+                     bits_to_megabits(r_download) + " Upload=" +
+                     bits_to_megabits(r_upload))
+
+        cache_until = datetime.datetime.now() + datetime.timedelta(
+            seconds=cache_seconds)
+
     return make_wsgi_app()
 
 
@@ -118,5 +128,6 @@ def mainPage():
 
 if __name__ == '__main__':
     PORT = os.getenv('SPEEDTEST_PORT', 9798)
-    logging.info("Starting Speedtest-Exporter on http://localhost:" + str(PORT))
+    logging.info("Starting Speedtest-Exporter on http://localhost:" +
+                 str(PORT))
     serve(app, host='0.0.0.0', port=PORT)
