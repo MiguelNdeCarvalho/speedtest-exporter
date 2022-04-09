@@ -104,12 +104,12 @@ def updateResults():
 
     if datetime.datetime.now() > cache_until:
         r_server, r_isp, r_jitter, r_ping, r_download, r_upload, r_status = runTest()
-        server.labels(isp=r_isp).set(r_server)
-        jitter.labels(isp=r_isp).set(r_jitter)
-        ping.labels(isp=r_isp).set(r_ping)
-        download_speed.labels(isp=r_isp).set(r_download)
-        upload_speed.labels(isp=r_isp).set(r_upload)
-        up.labels(isp=r_isp).set(r_status)
+        server.labels(server_id = r_server, isp=r_isp).set(r_server)
+        jitter.labels(server_id = r_server, isp=r_isp).set(r_jitter)
+        ping.labels(server_id = r_server, isp=r_isp).set(r_ping)
+        download_speed.labels(server_id = r_server, isp=r_isp).set(r_download)
+        upload_speed.labels(server_id = r_server, isp=r_isp).set(r_upload)
+        up.labels(server_id = r_server, isp=r_isp).set(r_status)
         logging.info("Server=" + str(r_server) + " ISP=" + r_isp + " Jitter=" + str(r_jitter) +
                      "ms" + " Ping=" + str(r_ping) + "ms" + " Download=" +
                      bits_to_megabits(r_download) + " Upload=" +
