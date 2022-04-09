@@ -20,16 +20,20 @@ log = logging.getLogger('waitress')
 log.disabled = True
 
 # Create Metrics
-server = Gauge('speedtest_server_id', 'Speedtest server ID used to test', ['isp'])
+server = Gauge('speedtest_server_id', 'Speedtest server ID used to test',
+               ['server_id', 'isp'])
 jitter = Gauge('speedtest_jitter_latency_milliseconds',
-               'Speedtest current Jitter in ms', ['isp'])
+               'Speedtest current Jitter in ms', ['server_id', 'isp'])
 ping = Gauge('speedtest_ping_latency_milliseconds',
-             'Speedtest current Ping in ms', ['isp'])
+             'Speedtest current Ping in ms', ['server_id', 'isp'])
 download_speed = Gauge('speedtest_download_bits_per_second',
-                       'Speedtest current Download Speed in bit/s', ['isp'])
+                       'Speedtest current Download Speed in bit/s',
+                       ['server_id', 'isp'])
 upload_speed = Gauge('speedtest_upload_bits_per_second',
-                     'Speedtest current Upload speed in bits/s', ['isp'])
-up = Gauge('speedtest_up', 'Speedtest status whether the scrape worked', ['isp'])
+                     'Speedtest current Upload speed in bits/s',
+                     ['server_id', 'isp'])
+up = Gauge('speedtest_up', 'Speedtest status whether the scrape worked',
+           ['server_id', 'isp'])
 
 # Cache metrics for how long (seconds)?
 cache_seconds = int(os.environ.get('SPEEDTEST_CACHE_FOR', 0))
@@ -94,8 +98,8 @@ def runTest():
                 download = bytes_to_bits(data['download']['bandwidth'])
                 upload = bytes_to_bits(data['upload']['bandwidth'])
                 isp_ = data['isp']
-                return (actual_server, isp_, actual_jitter, actual_ping, download,
-                        upload, 1)
+                return (actual_server, isp_, actual_jitter, actual_ping,
+                        download, upload, 1)
 
 
 @app.route("/metrics")
@@ -103,16 +107,17 @@ def updateResults():
     global cache_until
 
     if datetime.datetime.now() > cache_until:
-        r_server, r_isp, r_jitter, r_ping, r_download, r_upload, r_status = runTest()
-        server.labels(isp=r_isp).set(r_server)
-        jitter.labels(isp=r_isp).set(r_jitter)
-        ping.labels(isp=r_isp).set(r_ping)
-        download_speed.labels(isp=r_isp).set(r_download)
-        upload_speed.labels(isp=r_isp).set(r_upload)
-        up.labels(isp=r_isp).set(r_status)
-        logging.info("Server=" + str(r_server) + " ISP=" + r_isp + " Jitter=" + str(r_jitter) +
-                     "ms" + " Ping=" + str(r_ping) + "ms" + " Download=" +
-                     bits_to_megabits(r_download) + " Upload=" +
+        (r_server, r_isp, r_jitter, r_ping, r_download,
+         r_upload, r_status) = runTest()
+        server.labels(server_id=r_server, isp=r_isp).set(r_server)
+        jitter.labels(server_id=r_server, isp=r_isp).set(r_jitter)
+        ping.labels(server_id=r_server, isp=r_isp).set(r_ping)
+        download_speed.labels(server_id=r_server, isp=r_isp).set(r_download)
+        upload_speed.labels(server_id=r_server, isp=r_isp).set(r_upload)
+        up.labels(server_id=r_server, isp=r_isp).set(r_status)
+        logging.info("Server=" + str(r_server) + " ISP=" + r_isp + " Jitter="
+                     + str(r_jitter) + "ms" + " Ping=" + str(r_ping) + "ms" +
+                     " Download=" + bits_to_megabits(r_download) + " Upload=" +
                      bits_to_megabits(r_upload))
 
         cache_until = datetime.datetime.now() + datetime.timedelta(
