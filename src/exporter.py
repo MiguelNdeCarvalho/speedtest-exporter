@@ -6,6 +6,7 @@ import datetime
 from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
 from waitress import serve
+from shutil import which
 
 app = Flask("Speedtest-Exporter")  # Create flask app
 
@@ -132,7 +133,23 @@ def mainPage():
             "Click <a href='/metrics'>here</a> to see metrics.")
 
 
+def checkForBinary():
+    if which("speedtest") is None:
+        logging.error("Speedtest CLI binary not found. Please install it by" +
+                      " going to the official website.\n" +
+                      "https://www.speedtest.net/apps/cli")
+        exit(1)
+    speedtestVersionDialog = (subprocess.run(['speedtest', '--version'],
+                              capture_output=True, text=True))
+    if "Speedtest by Ookla" not in speedtestVersionDialog.stdout:
+        logging.error("Speedtest CLI that is installed is not the official" +
+                      " one. Please install it by going to the official" +
+                      " website.\nhttps://www.speedtest.net/apps/cli")
+        exit(1)
+
+
 if __name__ == '__main__':
+    checkForBinary()
     PORT = os.getenv('SPEEDTEST_PORT', 9798)
     logging.info("Starting Speedtest-Exporter on http://localhost:" +
                  str(PORT))
