@@ -20,16 +20,16 @@ log = logging.getLogger('waitress')
 log.disabled = True
 
 # Create Metrics
-server = Gauge('speedtest_server_id', 'Speedtest server ID used to test', ['isp'])
+server = Gauge('speedtest_server_id', 'Speedtest server ID used to test', ['server_id','isp'])
 jitter = Gauge('speedtest_jitter_latency_milliseconds',
-               'Speedtest current Jitter in ms', ['isp'])
+               'Speedtest current Jitter in ms', ['server_id','isp'])
 ping = Gauge('speedtest_ping_latency_milliseconds',
-             'Speedtest current Ping in ms', ['isp'])
+             'Speedtest current Ping in ms', ['server_id','isp'])
 download_speed = Gauge('speedtest_download_bits_per_second',
-                       'Speedtest current Download Speed in bit/s', ['isp'])
+                       'Speedtest current Download Speed in bit/s', ['server_id','isp'])
 upload_speed = Gauge('speedtest_upload_bits_per_second',
-                     'Speedtest current Upload speed in bits/s', ['isp'])
-up = Gauge('speedtest_up', 'Speedtest status whether the scrape worked', ['isp'])
+                     'Speedtest current Upload speed in bits/s', ['server_id','isp'])
+up = Gauge('speedtest_up', 'Speedtest status whether the scrape worked', ['server_id','isp'])
 
 # Cache metrics for how long (seconds)?
 cache_seconds = int(os.environ.get('SPEEDTEST_CACHE_FOR', 0))
