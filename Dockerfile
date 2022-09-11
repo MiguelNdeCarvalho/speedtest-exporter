@@ -1,7 +1,7 @@
 FROM python:3.10.7-alpine3.15
 
 # Speedtest CLI Version
-ARG SPEEDTEST_VERSION=1.1.1
+ARG SPEEDTEST_VERSION=1.2.0
 
 # Create user
 RUN adduser -D speedtest
