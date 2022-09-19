@@ -1,7 +1,7 @@
 FROM python:3.10-slim as build
 
 # Speedtest CLI Version
-ARG SPEEDTEST_VERSION=1.1.1
+ARG SPEEDTEST_VERSION=1.2.0
 
 RUN apt-get update && apt-get -y install curl
 
