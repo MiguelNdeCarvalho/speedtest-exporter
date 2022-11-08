@@ -1,12 +1,15 @@
-import subprocess
+#!python
+
+import datetime
+import logging
 import json
 import os
-import logging
-import datetime
-from prometheus_client import make_wsgi_app, Gauge
+import shutil
+import subprocess
+
 from flask import Flask
+from prometheus_client import make_wsgi_app, Gauge
 from waitress import serve
-from shutil import which
 
 app = Flask("Speedtest-Exporter")  # Create flask app
 
@@ -128,7 +131,7 @@ def mainPage():
 
 
 def checkForBinary():
-    if which("speedtest") is None:
+    if shutil.which("speedtest") is None:
         logging.error("Speedtest CLI binary not found. Please install it by" +
                       " going to the official website.\n" +
                       "https://www.speedtest.net/apps/cli")
