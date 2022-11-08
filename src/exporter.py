@@ -66,6 +66,9 @@ duration = Gauge(
 cache_seconds = int(os.environ.get('SPEEDTEST_CACHE_FOR', 0))
 cache_until = datetime.datetime.fromtimestamp(0)
 
+# Disable failed metrics
+DISABLE_FAILED_METRICS = os.environ.get('DISABLE_FAILED_METRICS', False)
+
 
 @dataclasses.dataclass
 class SpeedtestResult:
@@ -117,7 +120,7 @@ def failed(start: datetime.datetime) -> SpeedtestResult:
     )
 
 
-def runTest():
+def runTest() -> SpeedtestResult:
     start = now()
 
     serverID = os.environ.get('SPEEDTEST_SERVER')
@@ -172,13 +175,6 @@ def updateResults():
 
     if datetime.datetime.now() > cache_until:
         result = runTest()
-        server.labels(result_uuid=result.uuid).set(result.server)
-        jitter.labels(result_uuid=result.uuid).set(result.jitter)
-        ping.labels(result_uuid=result.uuid).set(result.ping)
-        download_speed.labels(result_uuid=result.uuid).set(result.download)
-        upload_speed.labels(result_uuid=result.uuid).set(result.upload)
-        up.labels(result_uuid=result.uuid).set(result.up)
-        duration.labels(result_uuid=result.uuid).set(result.duration)
 
         logging.info(
             "Server=" + str(result.server) + " " +
@@ -189,6 +185,18 @@ def updateResults():
             "Duration=" + str(result.duration) + "ms " +
             "UUID=" + str(result.uuid)
         )
+
+        if not result.up and DISABLE_FAILED_METRICS:
+            logging.info("Skipping failed metrics")
+            return
+
+        server.labels(result_uuid=result.uuid).set(result.server)
+        jitter.labels(result_uuid=result.uuid).set(result.jitter)
+        ping.labels(result_uuid=result.uuid).set(result.ping)
+        download_speed.labels(result_uuid=result.uuid).set(result.download)
+        upload_speed.labels(result_uuid=result.uuid).set(result.upload)
+        up.labels(result_uuid=result.uuid).set(result.up)
+        duration.labels(result_uuid=result.uuid).set(result.duration)
 
         cache_until = datetime.datetime.now() + datetime.timedelta(
             seconds=cache_seconds)
