@@ -11,6 +11,8 @@ from flask import Flask
 from waitress import serve
 from shutil import which
 
+MILLISECOND = datetime.timedelta(milliseconds=1)
+
 app = Flask("Speedtest-Exporter")  # Create flask app
 
 # Setup logging values
@@ -54,6 +56,11 @@ up = Gauge(
     'Speedtest status whether the scrape worked',
     labelnames=('result_uuid',),
 )
+duration = Gauge(
+    'speedtest_duration_milliseconds',
+    'Speedtest duration in milliseconds',
+    labelnames=('result_uuid',),
+)
 
 # Cache metrics for how long (seconds)?
 cache_seconds = int(os.environ.get('SPEEDTEST_CACHE_FOR', 0))
@@ -69,6 +76,7 @@ class SpeedtestResult:
     upload: float
     uuid: str
     up: int
+    duration: int
 
 
 def bytes_to_bits(bytes_per_sec):
@@ -88,8 +96,16 @@ def is_json(myjson):
     return True
 
 
-def runTest():
-    failed = SpeedtestResult(
+def now() -> datetime.datetime:
+    return datetime.datetime.now(datetime.timezone.utc)
+
+
+def milliseconds(duration: datetime.timedelta) -> float:
+    return duration / MILLISECOND
+
+
+def failed(start: datetime.datetime) -> SpeedtestResult:
+    return SpeedtestResult(
         server=0,
         jitter=0,
         ping=0,
@@ -97,7 +113,12 @@ def runTest():
         upload=0,
         uuid=str(uuid.uuid4()),
         up=0,
+        duration=milliseconds(now() - start),
     )
+
+
+def runTest():
+    start = now()
 
     serverID = os.environ.get('SPEEDTEST_SERVER')
     timeout = int(os.environ.get('SPEEDTEST_TIMEOUT', 90))
@@ -116,11 +137,11 @@ def runTest():
             if len(output) > 0:
                 logging.error('Speedtest CLI Error occurred that' +
                               'was not in JSON format')
-            return failed
+            return failed(start)
     except subprocess.TimeoutExpired:
         logging.error('Speedtest CLI process took too long to complete ' +
                       'and was killed.')
-        return failed
+        return failed(start)
 
     if is_json(output):
         data = json.loads(output)
@@ -128,7 +149,7 @@ def runTest():
             # Socket error
             print('Something went wrong')
             print(data['error'])
-            return failed
+            return failed(start)
         if "type" in data:
             if data['type'] == 'log':
                 print(str(data["timestamp"]) + " - " + str(data["message"]))
@@ -141,6 +162,7 @@ def runTest():
                     upload=bytes_to_bits(data['upload']['bandwidth']),
                     uuid=data.get('result', {}).get('id', str(uuid.uuid4())),
                     up=1,
+                    duration=milliseconds(now() - start),
                 )
 
 
@@ -156,6 +178,7 @@ def updateResults():
         download_speed.labels(result_uuid=result.uuid).set(result.download)
         upload_speed.labels(result_uuid=result.uuid).set(result.upload)
         up.labels(result_uuid=result.uuid).set(result.up)
+        duration.labels(result_uuid=result.uuid).set(result.duration)
 
         logging.info(
             "Server=" + str(result.server) + " " +
@@ -163,6 +186,7 @@ def updateResults():
             "Ping=" + str(result.ping) + "ms " +
             "Download=" + bits_to_megabits(result.download) + " " +
             "Upload=" + bits_to_megabits(result.upload) + " " +
+            "Duration=" + str(result.duration) + "ms " +
             "UUID=" + str(result.uuid)
         )
 
