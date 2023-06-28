@@ -3,6 +3,7 @@ import json
 import os
 import logging
 import datetime
+import time
 from prometheus_client import make_wsgi_app, Gauge
 from flask import Flask
 from waitress import serve
@@ -36,6 +37,8 @@ up = Gauge('speedtest_up', 'Speedtest status whether the scrape worked')
 cache_seconds = int(os.environ.get('SPEEDTEST_CACHE_FOR', 0))
 cache_until = datetime.datetime.fromtimestamp(0)
 
+# delay before running speedtest
+delay = int(os.environ.get('SPEEDTEST_DELAY', 0))
 
 def bytes_to_bits(bytes_per_sec):
     return bytes_per_sec * 8
@@ -100,7 +103,9 @@ def runTest():
 
 @app.route("/metrics")
 def updateResults():
-    global cache_until
+    global cache_until, delay
+
+    time.sleep(delay)
 
     if datetime.datetime.now() > cache_until:
         r_server, r_jitter, r_ping, r_download, r_upload, r_status = runTest()
