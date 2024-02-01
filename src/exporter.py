@@ -56,6 +56,10 @@ def is_json(myjson):
 
 def runTest():
     serverID = os.environ.get('SPEEDTEST_SERVER')
+    interface = os.environ.get('SPEEDTEST_INTERFACE')
+    ip = os.environ.get('SPEEDTEST_IP')
+    host = os.environ.get('SPEEDTEST_HOST')
+    precision = os.environ.get('SPEEDTEST_PRECISION')
     timeout = int(os.environ.get('SPEEDTEST_TIMEOUT', 90))
 
     cmd = [
@@ -64,6 +68,14 @@ def runTest():
     ]
     if serverID:
         cmd.append(f"--server-id={serverID}")
+    if interface:
+        cmd.append(f"--interface={interface}")
+    if ip:
+        cmd.append(f"--id={ip}")
+    if host:
+        cmd.append(f"--host={host}")
+    if precision:
+        cmd.append(f"--precision={precision}")
     try:
         output = subprocess.check_output(cmd, timeout=timeout)
     except subprocess.CalledProcessError as e:
