@@ -47,6 +47,4 @@ jobs:
           push: true
           tags: | 
             jansouza/speedtest-exporter:latest
-            jansouza/speedtest-exporter:${{ steps.tag.outputs.tag }}
             ghcr.io/jansouza/speedtest-exporter:latest
-            ghcr.io/jansouza/speedtest-exporter:${{ steps.tag.outputs.tag }}
