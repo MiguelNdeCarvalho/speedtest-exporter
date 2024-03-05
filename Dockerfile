@@ -12,7 +12,18 @@ ENV PATH="/app/venv/bin:$PATH"
 COPY src/. .
 RUN pip install --no-cache-dir -r requirements.txt
 
-ADD https://install.speedtest.net/app/cli/ookla-speedtest-${SPEEDTEST_VERSION}-linux-x86_64.tgz /tmp/speedtest.tgz
+RUN echo "TARGETPLATFORM=$TARGETPLATFORM"
+
+RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
+        curl -o /tmp/speedtest.tgz https://install.speedtest.net/app/cli/ookla-speedtest-${SPEEDTEST_VERSION}-linux-armhf.tgz; \
+    elif [ "$TARGETPLATFORM" = "linux/arm/v6" ]; then \
+        curl -o /tmp/speedtest.tgz https://install.speedtest.net/app/cli/ookla-speedtest-${SPEEDTEST_VERSION}-linux-armel.tgz; \
+    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+        curl -o /tmp/speedtest.tgz https://install.speedtest.net/app/cli/ookla-speedtest-${SPEEDTEST_VERSION}-linux-aarch64.tgz; \
+    else \
+        curl -o /tmp/speedtest.tgz https://install.speedtest.net/app/cli/ookla-speedtest-${SPEEDTEST_VERSION}-linux-x86_64.tgz; \
+    fi
+
 RUN tar zxvf /tmp/speedtest.tgz -C /tmp && \
     cp /tmp/speedtest /usr/local/bin
 
