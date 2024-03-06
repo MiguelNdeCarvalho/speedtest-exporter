@@ -1,4 +1,4 @@
-FROM python:3.10-slim as build
+FROM python:3.12-slim as build
 
 # Speedtest CLI Version
 ARG SPEEDTEST_VERSION=1.2.0
@@ -37,5 +37,3 @@ WORKDIR /app
 
 ENV PATH="/app/venv/bin:$PATH"
 CMD ["python", "-u", "exporter.py"]
-
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl -f http://localhost:${SPEEDTEST_PORT:=9798}/health
