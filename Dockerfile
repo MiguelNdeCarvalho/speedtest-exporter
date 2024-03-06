@@ -1,4 +1,6 @@
 FROM python:3.12-slim as build
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 
 # Speedtest CLI Version
 ARG SPEEDTEST_VERSION=1.2.0
@@ -12,7 +14,7 @@ ENV PATH="/app/venv/bin:$PATH"
 COPY src/. .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN echo "TARGETPLATFORM=$TARGETPLATFORM"
+RUN echo "TARGETPLATFORM=$TARGETPLATFORM BUILDPLATFORM=$BUILDPLATFORM"
 
 RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
         curl -o /tmp/speedtest.tgz https://install.speedtest.net/app/cli/ookla-speedtest-${SPEEDTEST_VERSION}-linux-armhf.tgz; \
