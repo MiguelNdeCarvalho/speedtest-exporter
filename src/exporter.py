@@ -3,7 +3,7 @@ import json
 import os
 import logging
 import datetime
-from prometheus_client import make_wsgi_app, Gauge
+from prometheus_client import make_wsgi_app, Gauge, Info
 from flask import Flask
 from waitress import serve
 from shutil import which
@@ -23,24 +23,23 @@ logging.basicConfig(encoding='utf-8',
 log = logging.getLogger('waitress')
 log.disabled = True
 
-# Create Metrics
-labels = ["server_id", "server_name", "isp"]
-
-jitter = Gauge('speedtest_jitter_latency_milliseconds',
-               'Speedtest current Jitter in ms', labels)
-ping = Gauge('speedtest_ping_latency_milliseconds',
-             'Speedtest current Ping in ms', labels)
-download_speed = Gauge('speedtest_download_bits_per_second',
-                       'Speedtest current Download Speed in bit/s', labels)
-upload_speed = Gauge('speedtest_upload_bits_per_second',
-                     'Speedtest current Upload speed in bits/s', labels)
-packet_loss = Gauge('speedtest_packet_loss',
-                    'Speedtest current Packet Loss in %', labels)
-up = Gauge('speedtest_up', 'Speedtest status whether the scrape worked', labels)
-
 # Cache metrics for how long (seconds)?
 cache_seconds = int(os.environ.get('SPEEDTEST_CACHE_FOR', 0))
 cache_until = datetime.datetime.fromtimestamp(0)
+
+# Create Metrics
+jitter = Gauge('speedtest_jitter_latency_milliseconds',
+               'Speedtest current Jitter in ms')
+ping = Gauge('speedtest_ping_latency_milliseconds',
+             'Speedtest current Ping in ms')
+download_speed = Gauge('speedtest_download_bits_per_second',
+                       'Speedtest current Download Speed in bit/s')
+upload_speed = Gauge('speedtest_upload_bits_per_second',
+                     'Speedtest current Upload speed in bits/s')
+packet_loss = Gauge('speedtest_packet_loss',
+                    'Speedtest current Packet Loss in %')
+up = Gauge('speedtest_up', 'Speedtest status whether the scrape worked')
+info = Info('speedtest', 'Speedtest test informations')
 
 
 def bytes_to_bits(bytes_per_sec):
@@ -79,11 +78,11 @@ def runTest():
             if len(output) > 0:
                 logging.error('Speedtest CLI Error occurred that' +
                               'was not in JSON format')
-            return (0, '', 0, 0, 0, 0, 0, '', 0)
+            return (0, '', '', '', '', '', 0, 0, 0, 0, 0, '', 0)
     except subprocess.TimeoutExpired:
         logging.error('Speedtest CLI process took too long to complete ' +
                       'and was killed.')
-        return (0, '', 0, 0, 0, 0, 0, '', 0)
+        return (0, '', '', '', '', '', 0, 0, 0, 0, 0, '', 0)
 
     if is_json(output):
         data = json.loads(output)
@@ -92,13 +91,17 @@ def runTest():
             # Socket error
             logging.error('Something went wrong')
             logging.error(data['error'])
-            return (0, '', 0, 0, 0, 0, 0, '', 0)
+            return (0, '', '', '', '', '', 0, 0, 0, 0, 0, '', 0)
         if "type" in data:
             if data['type'] == 'log':
                 logging.info(str(data["message"]))
             if data['type'] == 'result':
                 actual_server_id = int(data['server']['id'])
                 actual_server_name = data['server']['name']
+                actual_server_host = data['server']['host']
+                actual_server_location = data['server']['location']
+                actual_server_country = data['server']['country']
+                actual_server_ip = data['server']['ip']
                 actual_jitter = data['ping']['jitter']
                 actual_ping = data['ping']['latency']
                 actual_download = bytes_to_bits(data['download']['bandwidth'])
@@ -106,8 +109,10 @@ def runTest():
                 actual_loss = data.get('packetLoss', '0')
                 actual_isp = data.get('isp')
 
-                return (actual_server_id, actual_server_name, actual_jitter,
-                        actual_ping, actual_download, actual_upload, actual_loss, actual_isp, 1)
+                return (actual_server_id, actual_server_name, actual_server_host, 
+                        actual_server_location, actual_server_country, actual_server_ip,
+                        actual_jitter, actual_ping, actual_download, actual_upload, 
+                        actual_loss, actual_isp, 1)
 
 
 @app.route("/metrics")
@@ -115,22 +120,25 @@ def updateResults():
     global cache_until
 
     if datetime.datetime.now() > cache_until:
-        r_server_id, r_server_name, r_jitter, r_ping, r_download, r_upload, r_loss, r_isp, r_status = runTest()
+        r_server_id, r_server_name, r_server_host, r_server_location, r_server_country, r_server_ip, r_jitter, r_ping, r_download, r_upload, r_loss, r_isp, r_status = runTest()
         
-        jitter.labels(server_id=r_server_id,server_name=r_server_name,isp=r_isp).set(r_jitter)
-        ping.labels(server_id=r_server_id,server_name=r_server_name,isp=r_isp).set(r_ping)
-        download_speed.labels(server_id=r_server_id,server_name=r_server_name,isp=r_isp).set(r_download)
-        upload_speed.labels(server_id=r_server_id,server_name=r_server_name,isp=r_isp).set(r_upload)
-        packet_loss.labels(server_id=r_server_id,server_name=r_server_name,isp=r_isp).set(r_loss)
-        up.labels(server_id=r_server_id,server_name=r_server_name,isp=r_isp).set(r_status)
+        jitter.set(r_jitter)
+        ping.set(r_ping)
+        download_speed.set(r_download)
+        upload_speed.set(r_upload)
+        packet_loss.set(r_loss)
+        up.set(r_status)
+        info.info({'server_id' : str(r_server_id), 'server_name' : r_server_name, 
+                   'server_host' : r_server_host, 'server_location' : r_server_location, 
+                   'server_country' : r_server_country, 'server_ip' : r_server_ip,
+                   'isp' : r_isp})
 
         logging.info("Server=" + str(r_server_name) + " (" + str(r_server_id) + ")" +
                      " ISP=" + str(r_isp) + " Jitter=" + str(r_jitter) + "ms" + 
                      " Ping=" + str(r_ping) + "ms" + " PacketLoss=" + str(r_loss) +
                      " Download=" + bits_to_megabits(r_download) + " Upload=" + bits_to_megabits(r_upload))
 
-        cache_until = datetime.datetime.now() + datetime.timedelta(
-            seconds=cache_seconds)
+        cache_until = datetime.datetime.now() + datetime.timedelta(seconds=cache_seconds)
     else:
         logging.debug("Cached Until: " + str(cache_until))
 
