@@ -28,4 +28,4 @@ USER speedtest
 
 CMD ["python", "-u", "exporter.py"]
 
-HEALTHCHECK --timeout=10s CMD wget --no-verbose --tries=1 --spider http://localhost:${SPEEDTEST_PORT:=9798}/
+HEALTHCHECK --timeout=10s CMD wget --no-verbose --tries=1 --spider http://0.0.0.0:${SPEEDTEST_PORT:=9798}/
