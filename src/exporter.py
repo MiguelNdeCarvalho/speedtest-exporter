@@ -144,7 +144,8 @@ def checkForBinary():
 
 if __name__ == '__main__':
     checkForBinary()
+    HOST = os.getenv('SPEEDPORT_HOST', '0.0.0.0')
     PORT = os.getenv('SPEEDTEST_PORT', 9798)
-    logging.info("Starting Speedtest-Exporter on http://localhost:" +
+    logging.info(f"Starting Speedtest-Exporter on http://{HOST}:{PORT}" +
                  str(PORT))
-    serve(app, host='0.0.0.0', port=PORT)
+    serve(app, host=HOST, port=PORT)
